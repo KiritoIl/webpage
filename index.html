@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K O Z U T O</title>
+    <link rel="icon" type="image/png" href="android-chrome-192x192.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-video">
+        <video muted loop playsinline id="bg-video">
+            <source src="background-video.mp4" type="video/mp4">
+        </video>
+    </div>
+    
+
+    
+    <div class="container">
+        <div class="main-content">
+            <div class="clock" id="clock">00:00:00 AM</div>
+            <div class="main-name" id="mainName">! ｋｏｚｕｔｏ</div>
+            
+            <div class="social-links">
+                <a href="#" class="social-icon discord" title="Discord">
+                    <i class="fab fa-discord"></i>
+                </a>
+                <a href="#" class="social-icon github" title="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="#" class="social-icon whatsapp" title="WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+                <a href="#" class="social-icon instagram" title="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+            </div>
+            
+            <div class="volume-control">
+                <div class="volume-slider">
+                    <input type="range" id="volumeSlider" min="0" max="100" value="50">
+                    <span class="volume-value" id="volumeValue">50</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+Iron Throne Logo Instructions:
+
+1. Save the Iron Throne image you provided as "logo.png" in this directory
+2. The website is already configured to use it as a small logo at the top
+3. Recommended size: 80x80 pixels or similar small size
+4. The image will be automatically styled with the dark theme
+
+Note: Since I cannot directly save images from user uploads, please save your Iron Throne image as "logo.png" in this folder.

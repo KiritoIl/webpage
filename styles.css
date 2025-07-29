@@ -1,0 +1,233 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #0a0a0a;
+    color: white;
+    overflow: hidden;
+    height: 100vh;
+    cursor: url('image.png'), auto;
+}
+
+.background-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 1;
+}
+
+.background-video video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+
+
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+    z-index: 1;
+}
+
+.main-content {
+    text-align: center;
+    animation: fadeIn 2s ease-in;
+}
+
+.clock {
+    font-size: 3rem;
+    font-weight: 300;
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+.main-name {
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 2rem;
+    letter-spacing: 4px;
+    opacity: 0.9;
+    text-transform: lowercase;
+    font-family: 'Courier New', monospace;
+    position: relative;
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-name.glitch {
+    animation: glitch 0.3s ease-in-out;
+}
+
+@keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.social-icon {
+    color: white;
+    font-size: 1.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 0.5rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.social-icon:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+}
+
+.social-icon.discord:hover {
+    color: #7289da;
+    box-shadow: 0 10px 20px rgba(114, 137, 218, 0.4);
+}
+
+.social-icon.github:hover {
+    color: #f0f6fc;
+    box-shadow: 0 10px 20px rgba(240, 246, 252, 0.4);
+}
+
+.social-icon.whatsapp:hover {
+    color: #25d366;
+    box-shadow: 0 10px 20px rgba(37, 211, 102, 0.4);
+}
+
+.social-icon.instagram:hover {
+    color: #e4405f;
+    box-shadow: 0 10px 20px rgba(228, 64, 95, 0.4);
+}
+
+.volume-control {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.volume-slider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #2a2a2a;
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+}
+
+#volumeSlider {
+    width: 200px;
+    height: 8px;
+    background: #4d4d4d;
+    outline: none;
+    border-radius: 50px;
+    appearance: none;
+}
+
+#volumeSlider::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-top: -5px; /* Center thumb on track */
+    transition: all 0.3s ease;
+}
+
+#volumeSlider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+#volumeSlider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+.volume-value {
+    font-size: 1rem;
+    font-weight: 500;
+    min-width: 30px;
+    text-align: center;
+    color: #ccc;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+    to {
+        text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .clock {
+        font-size: 2rem;
+    }
+    
+    .main-name {
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+    }
+    
+
+    
+    
+
+    .social-links {
+        gap: 1.5rem;
+    }
+    
+    .social-icon {
+        font-size: 1.3rem;
+    }
+    
+    #volumeSlider {
+        width: 150px;
+    }
+}
