@@ -81,7 +81,6 @@ function updateClock() {
 // Volume slider functionality
 function initScrollVolume() {
     const video = document.querySelector('video');
-    const audio = document.getElementById('bg-audio');
     const volumeSlider = document.getElementById('volumeSlider');
 
     if (!volumeSlider) return;
@@ -89,7 +88,7 @@ function initScrollVolume() {
     window.addEventListener('wheel', (event) => {
         event.preventDefault();
 
-        let currentVolume = audio ? audio.volume : (video ? video.volume : 0.5);
+        let currentVolume = video ? video.volume : 0.5;
         if (event.deltaY < 0) {
             // Scroll up -> volume up
             currentVolume = Math.min(1, currentVolume + 0.05);
@@ -99,7 +98,6 @@ function initScrollVolume() {
         }
 
         if (video) video.volume = currentVolume;
-        if (audio) audio.volume = currentVolume;
 
         volumeSlider.value = currentVolume * 100;
         volumeSlider.style.background = `linear-gradient(to right, #fff ${volumeSlider.value}%, #4d4d4d ${volumeSlider.value}%)`;
@@ -115,7 +113,6 @@ function initVolumeSlider() {
     const volumeSlider = document.getElementById('volumeSlider');
     const volumeValue = document.getElementById('volumeValue');
     const video = document.querySelector('video');
-    const audio = document.getElementById('background-music');
 
     if (!volumeSlider || !volumeValue) return;
 
@@ -124,25 +121,26 @@ function initVolumeSlider() {
     };
 
     // Set initial value and background
-    const initialValue = 50; // Set a default visual for the slider
-    if (video) video.volume = 0; // Ensure video starts silent
-    if (audio) audio.volume = 0; // Ensure audio starts silent
+    const initialValue = 50;
+    if (video) video.volume = initialValue / 100;
     volumeSlider.value = initialValue;
     volumeValue.textContent = Math.round(initialValue);
     setSliderBackground(initialValue);
 
     volumeSlider.addEventListener('input', function() {
-        const value = this.value / 100;
-        if (video) video.volume = value;
-        if (audio) audio.volume = value;
-        volumeValue.textContent = Math.round(this.value);
-        setSliderBackground(this.value);
+        const value = this.value;
+        const volume = value / 100;
+
+        if (video) video.volume = volume;
+
+        volumeValue.textContent = Math.round(value);
+        setSliderBackground(value);
     });
 
-    // Handle audio volumechange event
-    if (audio) {
-        audio.addEventListener('volumechange', () => {
-            const currentVolume = Math.round(audio.volume * 100);
+    // Sync UI when volume changes externally
+    if (video) {
+        video.addEventListener('volumechange', () => {
+            const currentVolume = Math.round(video.volume * 100);
             volumeSlider.value = currentVolume;
             volumeValue.textContent = currentVolume;
             setSliderBackground(currentVolume);
@@ -199,42 +197,48 @@ function initAnimations() {
     });
 }
 
-// Background video error handling
+// Background video and audio handling
 function initBackgroundVideo() {
     const video = document.getElementById('bg-video');
-    if (video) {
-        // Use a promise to catch potential errors if play() is interrupted
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.error("Video play failed:", error);
-                // If playing fails, hide video and show fallback gradient
-                document.querySelector('.background-video').style.display = 'none';
-                document.body.style.background = 'linear-gradient(45deg, #0a0a0a, #1a1a1a, #0a0a0a)';
-                document.body.style.backgroundSize = '400% 400%';
-                document.body.style.animation = 'gradientShift 15s ease infinite';
-            });
-        }
-    }
-}
+    if (!video) return;
 
-// Background music initialization
-function initBackgroundMusic() {
-    const audio = document.getElementById('background-music');
-    if (audio) {
-        // Try to play background music
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log("Background music autoplay blocked by browser:", error);
-                // Add click-to-play functionality if autoplay is blocked
-                document.addEventListener('click', function playOnFirstClick() {
-                    audio.play().catch(e => console.log("Music play failed:", e));
-                    document.removeEventListener('click', playOnFirstClick);
-                }, { once: true });
-            });
+    let videoStarted = false;
+
+    // Function to start video with audio
+    const startVideo = () => {
+        if (!videoStarted) {
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    videoStarted = true;
+                    console.log('Background video with music started');
+                }).catch(error => {
+                    console.error("Video play failed:", error);
+                    // If playing fails, hide video and show fallback gradient
+                    document.querySelector('.background-video').style.display = 'none';
+                    document.body.style.background = 'linear-gradient(45deg, #0a0a0a, #1a1a1a, #0a0a0a)';
+                    document.body.style.backgroundSize = '400% 400%';
+                    document.body.style.animation = 'gradientShift 15s ease infinite';
+                });
+            }
         }
-    }
+    };
+
+    // Start video on first user interaction (required for autoplay with audio)
+    const userInteractionEvents = ['click', 'keydown', 'scroll', 'mousemove'];
+
+    const handleFirstInteraction = () => {
+        startVideo();
+        // Remove listeners after first interaction
+        userInteractionEvents.forEach(event => {
+            document.removeEventListener(event, handleFirstInteraction);
+        });
+    };
+
+    // Add listeners for user interaction
+    userInteractionEvents.forEach(event => {
+        document.addEventListener(event, handleFirstInteraction);
+    });
 }
 
 // Add gradient animation for fallback
@@ -301,7 +305,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initSocialLinks();
     initAnimations();
     initBackgroundVideo();
-    initBackgroundMusic();
     initDynamicTitle();
     initScrollVolume();
 
