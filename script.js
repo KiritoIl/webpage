@@ -81,14 +81,15 @@ function updateClock() {
 // Volume slider functionality
 function initScrollVolume() {
     const video = document.querySelector('video');
+    const audio = document.getElementById('bg-audio');
     const volumeSlider = document.getElementById('volumeSlider');
 
-    if (!video || !volumeSlider) return;
+    if (!volumeSlider) return;
 
     window.addEventListener('wheel', (event) => {
         event.preventDefault();
 
-        let currentVolume = video.volume;
+        let currentVolume = audio ? audio.volume : (video ? video.volume : 0.5);
         if (event.deltaY < 0) {
             // Scroll up -> volume up
             currentVolume = Math.min(1, currentVolume + 0.05);
@@ -97,9 +98,16 @@ function initScrollVolume() {
             currentVolume = Math.max(0, currentVolume - 0.05);
         }
 
-        video.volume = currentVolume;
+        if (video) video.volume = currentVolume;
+        if (audio) audio.volume = currentVolume;
+        
         volumeSlider.value = currentVolume * 100;
         volumeSlider.style.background = `linear-gradient(to right, #fff ${volumeSlider.value}%, #4d4d4d ${volumeSlider.value}%)`;
+        
+        const volumeValue = document.getElementById('volumeValue');
+        if (volumeValue) {
+            volumeValue.textContent = Math.round(currentVolume * 100);
+        }
     }, { passive: false });
 }
 
@@ -107,33 +115,42 @@ function initVolumeSlider() {
     const volumeSlider = document.getElementById('volumeSlider');
     const volumeValue = document.getElementById('volumeValue');
     const video = document.querySelector('video');
+    const audio = document.getElementById('bg-audio');
 
-    if (!volumeSlider || !volumeValue || !video) return;
+    if (!volumeSlider || !volumeValue) return;
 
     const setSliderBackground = (value) => {
         volumeSlider.style.background = `linear-gradient(to right, #fff ${value}%, #4d4d4d ${value}%)`;
     };
 
     // Set initial value and background
-        // Start with video muted, but slider at a default value (e.g., 50)
-    video.volume = 0; // Ensure it starts silent
     const initialValue = 50; // Set a default visual for the slider
+    if (video) video.volume = 0; // Ensure video starts silent
+    if (audio) audio.volume = 0; // Ensure audio starts silent
     volumeSlider.value = initialValue;
     volumeValue.textContent = Math.round(initialValue);
     setSliderBackground(initialValue);
 
-        volumeSlider.addEventListener('input', function() {
+    volumeSlider.addEventListener('input', function() {
         const value = this.value;
-        video.volume = value / 100;
-        // The 'volumechange' event will handle updating the UI
+        const volume = value / 100;
+        
+        if (video) video.volume = volume;
+        if (audio) audio.volume = volume;
+        
+        volumeValue.textContent = Math.round(value);
+        setSliderBackground(value);
     });
 
-    video.addEventListener('volumechange', () => {
-        const currentVolume = Math.round(video.volume * 100);
-        volumeSlider.value = currentVolume;
-        volumeValue.textContent = currentVolume;
-        setSliderBackground(currentVolume);
-    });
+    // Sync UI when volume changes externally
+    if (audio) {
+        audio.addEventListener('volumechange', () => {
+            const currentVolume = Math.round(audio.volume * 100);
+            volumeSlider.value = currentVolume;
+            volumeValue.textContent = currentVolume;
+            setSliderBackground(currentVolume);
+        });
+    }
 }
 
 // Social links functionality
@@ -185,7 +202,7 @@ function initAnimations() {
     });
 }
 
-// Background video error handling
+// Background video and audio handling
 function initBackgroundVideo() {
     const video = document.getElementById('bg-video');
     if (video) {
@@ -202,6 +219,44 @@ function initBackgroundVideo() {
             });
         }
     }
+}
+
+function initBackgroundAudio() {
+    const audio = document.getElementById('bg-audio');
+    if (!audio) return;
+
+    let audioStarted = false;
+
+    // Function to start audio
+    const startAudio = () => {
+        if (!audioStarted) {
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    audioStarted = true;
+                    console.log('Background music started');
+                }).catch(error => {
+                    console.error("Audio play failed:", error);
+                });
+            }
+        }
+    };
+
+    // Start audio on first user interaction
+    const userInteractionEvents = ['click', 'keydown', 'scroll', 'mousemove'];
+    
+    const handleFirstInteraction = () => {
+        startAudio();
+        // Remove listeners after first interaction
+        userInteractionEvents.forEach(event => {
+            document.removeEventListener(event, handleFirstInteraction);
+        });
+    };
+
+    // Add listeners for user interaction
+    userInteractionEvents.forEach(event => {
+        document.addEventListener(event, handleFirstInteraction);
+    });
 }
 
 // Add gradient animation for fallback
@@ -268,7 +323,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initSocialLinks();
     initAnimations();
     initBackgroundVideo();
-        initDynamicTitle();
+    initBackgroundAudio();
+    initDynamicTitle();
     initScrollVolume();
 
     
