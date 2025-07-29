@@ -2,7 +2,7 @@
 function generateRandomText() {
     // Using the exact symbols from the user
     const enchantingSymbols = 'ᔑʖᓵ↸ᒷ⎓⊣⍑╎⋮ꖌꖎᒲリ𝙹!¡ᑑ∷ᓭℸ ̣⚍⍊∴̇/||⨅';
-    
+
     return {
         randomChars: (length = 8) => {
             let result = '';
@@ -19,36 +19,36 @@ function initDynamicTitle() {
     const textGen = generateRandomText();
     let isAnimating = false;
     let animationInterval;
-    
+
     // Generate different length sequences of random symbols
     const textLengths = [5, 6, 7, 8, 9, 10, 6, 7, 8, 5];
     let lengthIndex = 0;
-    
+
     function startContinuousAnimation() {
         if (isAnimating) return;
         isAnimating = true;
-        
+
         const currentLength = textLengths[lengthIndex];
         lengthIndex = (lengthIndex + 1) % textLengths.length;
-        
+
         // Super fast animation - change every 30ms
         animationInterval = setInterval(() => {
             const randomText = textGen.randomChars(currentLength);
             document.title = randomText;
         }, 30); // Super fast - 30ms per change
-        
+
         // Change length every 2-3 seconds
         setTimeout(() => {
             clearInterval(animationInterval);
             isAnimating = false;
-            
+
             // Brief pause before next sequence
             setTimeout(() => {
                 startContinuousAnimation();
             }, 200);
         }, Math.random() * 1000 + 2000); // 2-3 seconds
     }
-    
+
     // Start the continuous animation
     startContinuousAnimation();
 }
@@ -64,16 +64,16 @@ function updateClock() {
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    
+
     // Convert to 12-hour format
     hours = hours % 12;
     hours = hours ? hours : 12; // 0 should be 12
-    
+
     // Add leading zeros
     const formattedHours = hours.toString().padStart(2, '0');
     const formattedMinutes = minutes.toString().padStart(2, '0');
     const formattedSeconds = seconds.toString().padStart(2, '0');
-    
+
     const timeString = `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
     document.getElementById('clock').textContent = timeString;
 }
@@ -100,10 +100,10 @@ function initScrollVolume() {
 
         if (video) video.volume = currentVolume;
         if (audio) audio.volume = currentVolume;
-        
+
         volumeSlider.value = currentVolume * 100;
         volumeSlider.style.background = `linear-gradient(to right, #fff ${volumeSlider.value}%, #4d4d4d ${volumeSlider.value}%)`;
-        
+
         const volumeValue = document.getElementById('volumeValue');
         if (volumeValue) {
             volumeValue.textContent = Math.round(currentVolume * 100);
@@ -115,7 +115,7 @@ function initVolumeSlider() {
     const volumeSlider = document.getElementById('volumeSlider');
     const volumeValue = document.getElementById('volumeValue');
     const video = document.querySelector('video');
-    const audio = document.getElementById('bg-audio');
+    const audio = document.getElementById('background-music');
 
     if (!volumeSlider || !volumeValue) return;
 
@@ -132,17 +132,14 @@ function initVolumeSlider() {
     setSliderBackground(initialValue);
 
     volumeSlider.addEventListener('input', function() {
-        const value = this.value;
-        const volume = value / 100;
-        
-        if (video) video.volume = volume;
-        if (audio) audio.volume = volume;
-        
-        volumeValue.textContent = Math.round(value);
-        setSliderBackground(value);
+        const value = this.value / 100;
+        if (video) video.volume = value;
+        if (audio) audio.volume = value;
+        volumeValue.textContent = Math.round(this.value);
+        setSliderBackground(this.value);
     });
 
-    // Sync UI when volume changes externally
+    // Handle audio volumechange event
     if (audio) {
         audio.addEventListener('volumechange', () => {
             const currentVolume = Math.round(audio.volume * 100);
@@ -156,21 +153,21 @@ function initVolumeSlider() {
 // Social links functionality
 function initSocialLinks() {
     const socialLinks = document.querySelectorAll('.social-icon');
-    
+
     socialLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            
+
             // Add click animation
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = '';
             }, 150);
-            
+
             // You can add actual URLs here
             const platform = this.classList[1]; // Gets the second class (discord, github, etc.)
             console.log(`Clicked on ${platform} link`);
-            
+
             // Example URLs - replace with your actual links
             const urls = {
                 discord: 'https://discord.gg/yourserver',
@@ -178,7 +175,7 @@ function initSocialLinks() {
                 whatsapp: 'https://wa.me/yournumber',
                 instagram: 'https://instagram.com/yourusername'
             };
-            
+
             if (urls[platform]) {
                 // window.open(urls[platform], '_blank');
                 console.log(`Would open: ${urls[platform]}`);
@@ -193,7 +190,7 @@ function initAnimations() {
     elements.forEach((element, index) => {
         element.style.opacity = '0';
         element.style.transform = 'translateY(30px)';
-        
+
         setTimeout(() => {
             element.style.transition = 'all 0.8s ease';
             element.style.opacity = '1';
@@ -202,7 +199,7 @@ function initAnimations() {
     });
 }
 
-// Background video and audio handling
+// Background video error handling
 function initBackgroundVideo() {
     const video = document.getElementById('bg-video');
     if (video) {
@@ -221,42 +218,23 @@ function initBackgroundVideo() {
     }
 }
 
-function initBackgroundAudio() {
-    const audio = document.getElementById('bg-audio');
-    if (!audio) return;
-
-    let audioStarted = false;
-
-    // Function to start audio
-    const startAudio = () => {
-        if (!audioStarted) {
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    audioStarted = true;
-                    console.log('Background music started');
-                }).catch(error => {
-                    console.error("Audio play failed:", error);
-                });
-            }
+// Background music initialization
+function initBackgroundMusic() {
+    const audio = document.getElementById('background-music');
+    if (audio) {
+        // Try to play background music
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log("Background music autoplay blocked by browser:", error);
+                // Add click-to-play functionality if autoplay is blocked
+                document.addEventListener('click', function playOnFirstClick() {
+                    audio.play().catch(e => console.log("Music play failed:", e));
+                    document.removeEventListener('click', playOnFirstClick);
+                }, { once: true });
+            });
         }
-    };
-
-    // Start audio on first user interaction
-    const userInteractionEvents = ['click', 'keydown', 'scroll', 'mousemove'];
-    
-    const handleFirstInteraction = () => {
-        startAudio();
-        // Remove listeners after first interaction
-        userInteractionEvents.forEach(event => {
-            document.removeEventListener(event, handleFirstInteraction);
-        });
-    };
-
-    // Add listeners for user interaction
-    userInteractionEvents.forEach(event => {
-        document.addEventListener(event, handleFirstInteraction);
-    });
+    }
 }
 
 // Add gradient animation for fallback
@@ -274,17 +252,17 @@ document.head.appendChild(style);
 function initCursorTrail() {
     const trail = [];
     const trailLength = 10;
-    
+
     document.addEventListener('mousemove', function(e) {
         trail.push({ x: e.clientX, y: e.clientY });
-        
+
         if (trail.length > trailLength) {
             trail.shift();
         }
-        
+
         // Remove existing trail elements
         document.querySelectorAll('.cursor-trail').forEach(el => el.remove());
-        
+
         // Create new trail elements
         trail.forEach((point, index) => {
             const trailElement = document.createElement('div');
@@ -303,7 +281,7 @@ function initCursorTrail() {
                 transition: all 0.1s ease;
             `;
             document.body.appendChild(trailElement);
-            
+
             // Remove after animation
             setTimeout(() => {
                 if (trailElement.parentNode) {
@@ -318,19 +296,19 @@ function initCursorTrail() {
 document.addEventListener('DOMContentLoaded', function() {
     updateClock();
     setInterval(updateClock, 1000);
-    
+
     initVolumeSlider();
     initSocialLinks();
     initAnimations();
     initBackgroundVideo();
-    initBackgroundAudio();
+    initBackgroundMusic();
     initDynamicTitle();
     initScrollVolume();
 
-    
+
     // Optional: Enable cursor trail (uncomment if you want this effect)
     // initCursorTrail();
-    
+
     console.log('Website initialized successfully!');
 });
 
@@ -344,7 +322,7 @@ document.addEventListener('keydown', function(e) {
             document.exitFullscreen();
         }
     }
-    
+
     // Press 'R' to refresh animations
     if (e.key === 'r' || e.key === 'R') {
         initAnimations();
